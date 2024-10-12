@@ -66,12 +66,26 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
-  const userId = req.body.emailId;
 
   try {
-    const user = await User.findOneAndUpdate({ emailId: userId }, data, {
+    const ALLOWED_FIELDS = ["photoUrl", "about", "gender", "age", "skills"];
+
+    const isupdateAllowed = Object.keys(data).every((key) =>
+      ALLOWED_FIELDS.includes(key)
+    );
+
+    if (!isupdateAllowed) {
+      throw new Error("Updating this field is not allowed");
+    }
+
+    if (data?.skills.length > 10) {
+      throw new Error("Skills can only be upto 10");
+    }
+
+    const user = await User.findOneAndUpdate({ _id: userId }, data, {
       runValidators: true,
     });
     res.send("User updated successfully");
