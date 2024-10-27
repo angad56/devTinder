@@ -62,7 +62,7 @@ authRouter.post("/login", async (req, res) => {
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 360000000),
       });
-      res.send("User Authenticated");
+      res.send(userpresent);
     } else {
       throw new Error("Wrong Password. Try Again");
     }
