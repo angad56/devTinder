@@ -50,7 +50,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
 
-    const connections = await ConnectionRequest.find({
+    const connectionRequests = await ConnectionRequest.find({
       $or: [
         { fromUserId: loggedInUser._id, status: "accepted" },
         { toUserId: loggedInUser._id, status: "accepted" },
@@ -59,15 +59,15 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
       .populate("fromUserId", USER_SAFE_DATA)
       .populate("toUserId", USER_SAFE_DATA);
 
-    const data = connections.map((row) => {
-      if (row.fromUserId.toString() === loggedInUser._id.toString()) {
+    const data = connectionRequests.map((row) => {
+      if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
         return row.toUserId;
+      } else {
+        return row.fromUserId;
       }
-
-      return row.fromUserId;
     });
 
-    if (!connections) {
+    if (!connectionRequests) {
       return res.status(404).json({ message: "No Connections" });
     }
 
