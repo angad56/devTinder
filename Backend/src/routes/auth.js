@@ -16,14 +16,6 @@ authRouter.post("/signup", async (req, res) => {
 
     //Encrypt the Password
     const hashedpass = await bcrypt.hash(password, 10);
-    // console.log(hashedpass);
-
-    //   const userObj = {
-    //     firstName: "Khushi",
-    //     lastName: "Nagriya",
-    //     emailId: "khushi@gmail.com",
-    //     password: "12345",
-    //   };
 
     // creating new Instance of the User Model
     const user = new User({
@@ -33,9 +25,16 @@ authRouter.post("/signup", async (req, res) => {
       password: hashedpass,
     });
 
-    await user.save();
+    const savedUser = await user.save();
+    const token = await savedUser.getJWT();
 
-    res.status(401).send("User added successfully");
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 8 * 360000000),
+    });
+
+    res
+      .status(200)
+      .json({ message: "User added successfully", data: savedUser });
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
