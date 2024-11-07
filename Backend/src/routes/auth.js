@@ -30,6 +30,9 @@ authRouter.post("/signup", async (req, res) => {
 
     res.cookie("token", token, {
       expires: new Date(Date.now() + 8 * 360000000),
+      httpOnly: true, // Prevents JavaScript access to cookie for security
+      secure: true, // Ensures the cookie is sent only over HTTPS
+      sameSite: "None", // Allows cookies to be sent across different domains
     });
 
     res
@@ -60,7 +63,11 @@ authRouter.post("/login", async (req, res) => {
       //Addt the token to cookie and send the cookie to the User
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 360000000),
+        httpOnly: true, // Prevents JavaScript access to cookie for security
+        secure: true, // Ensures the cookie is sent only over HTTPS
+        sameSite: "None", // Allows cookies to be sent across different domains
       });
+
       res.send(userpresent);
     } else {
       throw new Error("Wrong Password. Try Again");
